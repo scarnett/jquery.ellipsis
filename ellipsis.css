@@ -1,0 +1,41 @@
+.ellipsisWrapper {
+	position: relative;
+	white-space: nowrap;
+	overflow: hidden;
+	display: block;
+}
+
+span.ellipsis {
+	color: #cccccc;
+	font-weight: bold;
+	padding-left: 20px;
+	position: absolute;
+	text-align: right;
+	top: 0;
+}
+
+span.ellipsis {
+	background: -moz-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(255, 255, 255, 0)), color-stop(50%, rgba(255, 255, 255, 1)));
+	background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%,rgba(255, 255, 255, 1) 50%);
+	background: -o-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%);
+	background: -ms-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%);
+	background: linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ffffff', GradientType=1);
+}
+
+span.ellipsisOverlay {
+	background-color: rgba(255, 255, 255, 1.0);
+	font-weight: bold;
+	padding: 4px;
+	position: absolute;
+	border: 1px solid rgba(221, 221, 221, 1.0);
+	border-radius: 4px;
+	box-shadow: 0px 5px 5px -5px rgba(0, 0, 0, 0.2), 0px 1px 0px 0px rgba(255, 255, 255, 0.8) inset;
+	z-index: 100;
+	max-width: 600px;
+}
+
+.ellipsisWrapper span.ellipsisOverlay {
+	white-space: normal;
+}
