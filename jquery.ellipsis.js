@@ -4,9 +4,10 @@
 (function($) {
     $.fn.ellipsis = function(options) {
         var defaults = {
+            container: $('body'),
             timeout: 600
         };
-        
+
         options = $.extend(defaults, options);
         
         var wrappers = $(this);
@@ -18,7 +19,7 @@
             }
             
             var wrapperWidth = wrapper.children().width();
-            if (wrapperWidth == null) {
+            if (wrapperWidth === null) {
                 wrapperWidth = wrapper.width();
             }
             
@@ -28,55 +29,93 @@
             });
             
             var maxWidth = parentContainer.width();
-            if (wrapperWidth > maxWidth) {
+            if ((wrapperWidth > maxWidth) && !wrapper.data('ellipsisWrapped')) {
+                wrapper.data('ellipsisWrapped', true);
+                
                 var ellipsis = $('<span class="ellipsis"/>');
                 ellipsis.html('...');
                 ellipsis.appendTo(wrapper);
                 ellipsis.css('right', -1);
                 
-                wrapper.hover(function() {
-                    var timer = window.setTimeout(function () {
-                        wrapper.css('overflow', 'visible');
+                wrapper.mouseenter(function() {
+                    var timer = window.setTimeout(function() {
+                        var pos = wrapper.offset();
                         parentContainer.css('overflow', 'visible');
                         
                         var text = wrapper.text();
                         var overlay = $('<span class="ellipsisOverlay"/>');
                         var anchor = wrapper.find('a');
                         if (anchor.length) {
-                            overlay.html(anchor.clone().html(text.replace('...', '')));
+                            overlay.html(anchor.clone().html(text.replace('...', '').trim()));
                         }
                         else {
-                            overlay.html(wrapper.clone().html(text.replace('...', '')));
+                            overlay.html(wrapper.clone().html(text.replace('...', '').trim()));
                         }
                         
-                        overlay.appendTo(wrapper);
+                        if (options.container !== undefined) {
+                            overlay.appendTo(options.container);
+                        }
+                        else {
+                            overlay.appendTo(wrapper);
+                        }
                         
-                        var pos = $(wrapper).offset();
-                        $(overlay).css({
-                            'position': 'absolute',
-                            'zIndex': 5000,
-                            'left': '-5px',
-                            'top': '-5px'
+                        overlay.css(positionIt(pos));
+                        overlay.mouseleave(function() {
+                            hideIt(wrapper, parentContainer);
                         });
                         
-                       wrapper.children().first().css('visibility', 'hidden');
+                        wrapper.children().first().css('visibility', 'hidden');
                     }, options.timeout);
                     
                     wrapper.data('timerId', timer);
-                },
-                function() {
-                    var timerId = wrapper.data('timerId');
-                    if (timerId != null) {
-                        window.clearTimeout(timerId);
-                        $.removeData(wrapper, 'timerId');
-                    }
-                    
-                    $('span.ellipsisOverlay', wrapper).remove();
-                    wrapper.css('overflow', 'hidden');
-                    wrapper.children().first().css('visibility', 'visible');
-                    parentContainer.css('overflow', 'visible');
                 });
             }
+            else if ((wrapperWidth <= maxWidth) && wrapper.data('ellipsisWrapped')) {
+                $('span.ellipsis', wrapper).remove();
+                wrapper.removeAttr('style');
+                wrapper.data('ellipsisWrapped', false);
+            }
         });
+        
+        function hideIt(wrapper, parentContainer) {
+            var timerId = wrapper.data('timerId');
+            if (timerId !== null) {
+                window.clearTimeout(timerId);
+                $.removeData(wrapper, 'timerId');
+            }
+            
+            if (options.container !== undefined) {
+                $('span.ellipsisOverlay', options.container).remove();
+            }
+            else {
+                $('span.ellipsisOverlay', wrapper).remove();
+            }
+            
+            wrapper.children().first().css('visibility', 'visible');
+            parentContainer.css('overflow', 'visible');
+        };
+        
+        function positionIt(pos) {
+            var css = {};
+            
+            if (options.container !== undefined) {
+                css = {
+                    'position': 'absolute',
+                    'zIndex': 5000,
+                    'left': (pos.left - 5),
+                    'top': (pos.top - 5)
+                };
+            }
+            else {
+                css = {
+                    'position': 'absolute',
+                    'zIndex': 5000,
+                    'left': '-5px',
+                    'top': '-5px'
+                };
+            }
+            
+            return css;
+        };
     };
 })(jQuery);

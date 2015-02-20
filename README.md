@@ -42,9 +42,15 @@ Here is list of available options
 
 | Option | Default | Type | Description
 |--------|---------|------|------------
+| `container` | `body` | string | The ellipsis overlay container
 | `timeout` | `600` | int | The time in milliseconds to delay before showing the full text
 
 ## Changelog
+
+`1.0.1` / `02.19.2015`
+
+- Made the container configurable
+- Bug fixes
 
 `1.0.0` / `01.29.2015`
 

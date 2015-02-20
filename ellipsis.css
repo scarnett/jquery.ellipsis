@@ -36,6 +36,6 @@ span.ellipsisOverlay {
 	max-width: 600px;
 }
 
-.ellipsisWrapper span.ellipsisOverlay {
-	white-space: normal;
+.ellipsisWrapper span.ellipsisOverlay, .ellipsisOverlay span.ellipsisWrapper {
+    white-space: normal;
 }
