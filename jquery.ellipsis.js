@@ -7,65 +7,71 @@
             container: 'body',
             timeout: 600
         };
-        
+
         options = $.extend(defaults, options);
         
         var wrappers = $(this);
         wrappers.each(function() {
             var wrapper = $(this);
-            var container = getContainer(wrapper);
-            
-            if (!wrapper.children().length) {
-                wrapper.wrapInner('<span/>');
-            }
-            
-            var wrapperWidth = wrapper.children().width();
-            if (wrapperWidth === null) {
-                wrapperWidth = wrapper.width();
-            }
-            
-            var parentContainer = wrapper.parent();
-            parentContainer.css({
-                'overflow': 'hidden'
-            });
-            
-            var maxWidth = parentContainer.width();
-            if (wrapperWidth > maxWidth) {
-                var ellipsis = $('<span class="ellipsis"/>');
-                ellipsis.html('...');
-                ellipsis.appendTo(wrapper);
-                ellipsis.css('right', -1);
+            if (!wrapper.data('ellipsisWrapped')) {
+                var container = getContainer(wrapper);
                 
-                wrapper.hover(function() {
-                    var timer = window.setTimeout(function() {
-                        var pos = wrapper.offset();
-                        parentContainer.css('overflow', 'visible');
-                        
-                        var text = wrapper.text();
-                        var overlay = $('<span class="ellipsisOverlay"/>');
-                        var anchor = wrapper.find('a');
-                        if (anchor.length) {
-                            overlay.html(anchor.clone().html(text.replace('...', '').trim()));
-                        }
-                        else {
-                            overlay.html(wrapper.clone().html(text.replace('...', '').trim()));
-                        }
-                        
-                        overlay.appendTo(container);
-                        overlay.css(positionIt(pos));
-                        
-                        wrapper.children().first().css('visibility', 'hidden');
-                    }, options.timeout);
-                    
-                    wrapper.data('timerId', timer);
-                }, function() {
-                    hideIt(wrapper, parentContainer);
+                if (!wrapper.children().length) {
+                    wrapper.wrapInner('<span/>');
+                }
+                
+                var wrapperWidth = wrapper.children().width();
+                if (wrapperWidth === null) {
+                    wrapperWidth = wrapper.width();
+                }
+                
+                var parentContainer = wrapper.parent();
+                parentContainer.css({
+                    'overflow': 'hidden'
                 });
+                
+                var maxWidth = parentContainer.width();
+                if (wrapperWidth > maxWidth) {
+                    var ellipsis = $('<span class="ellipsis"/>');
+                    ellipsis.html('...');
+                    ellipsis.appendTo(wrapper);
+                    ellipsis.css('right', -1);
+                    
+                    wrapper.hover(function() {
+                        var timer = window.setTimeout(function() {
+                            var pos = wrapper.offset();
+                            parentContainer.css('overflow', 'visible');
+                            
+                            var text = wrapper.text();
+                            var overlay = $('<span class="ellipsisOverlay"/>');
+                            var anchor = wrapper.find('a');
+                            if (anchor.length) {
+                                var clone = anchor.clone().css('visibility', 'visible');
+                                overlay.html(clone.html(text.replace('...', '').trim()));
+                            }
+                            else {
+                                var clone = wrapper.clone().css('visibility', 'visible');
+                                overlay.html(clone.html(text.replace('...', '').trim()));
+                            }
+                            
+                            overlay.appendTo(container);
+                            overlay.css(positionIt(pos));
+                            
+                            wrapper.children().first().css('visibility', 'hidden');
+                        }, options.timeout);
+                        
+                        wrapper.data('timerId', timer);
+                    }, function() {
+                        hideIt(wrapper, parentContainer);
+                    });
+                }
+                else if (wrapperWidth <= maxWidth) {
+                    $('span.ellipsis', wrapper).remove();
+                    wrapper.removeAttr('style');
+                }
             }
-            else if (wrapperWidth <= maxWidth) {
-                $('span.ellipsis', wrapper).remove();
-                wrapper.removeAttr('style');
-            }
+            
+            wrapper.data('ellipsisWrapped', true);
         });
         
         function hideIt(wrapper, parentContainer) {
@@ -96,7 +102,7 @@
             
             wrapper.children().first().css('visibility', 'visible');
             parentContainer.css('overflow', 'visible');
-        }
+        };
         
         function positionIt(pos) {
             var css = {};
@@ -132,10 +138,6 @@
             }
             
             return container;
-        }
+        };
     };
-    
-    $(document).ready(function() {
-        $('.ellipsisWrapper').ellipsis();
-    });
 })(jQuery);
