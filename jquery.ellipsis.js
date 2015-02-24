@@ -45,15 +45,16 @@
                             var text = wrapper.text();
                             var overlay = $('<span class="ellipsisOverlay"/>');
                             var anchor = wrapper.find('a');
+                            var clone;
+                            
                             if (anchor.length) {
-                                var clone = anchor.clone().css('visibility', 'visible');
-                                overlay.html(clone.html(text.replace('...', '').trim()));
+                                clone = anchor.clone().css('visibility', 'visible');
                             }
                             else {
-                                var clone = wrapper.clone().css('visibility', 'visible');
-                                overlay.html(clone.html(text.replace('...', '').trim()));
+                                clone = wrapper.clone().css('visibility', 'visible');
                             }
                             
+                            overlay.html(clone.html(text.replace('...', '').trim()));
                             overlay.appendTo(container);
                             overlay.css(positionIt(pos));
                             
