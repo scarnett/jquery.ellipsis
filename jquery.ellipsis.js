@@ -1,18 +1,19 @@
 // jquery.ellipsis.js
 // https://github.com/scarnett/jquery.ellipsis
 // 01-29-2015, Scott Carnett, MIT License
-(function($) {
+(function ($) {
     $.fn.ellipsis = function(options) {
         var defaults = {
-            container: $('body'),
+            container: 'body',
             timeout: 600
         };
-
+        
         options = $.extend(defaults, options);
         
         var wrappers = $(this);
         wrappers.each(function() {
             var wrapper = $(this);
+            var container = getContainer(wrapper);
             
             if (!wrapper.children().length) {
                 wrapper.wrapInner('<span/>');
@@ -29,15 +30,13 @@
             });
             
             var maxWidth = parentContainer.width();
-            if ((wrapperWidth > maxWidth) && !wrapper.data('ellipsisWrapped')) {
-                wrapper.data('ellipsisWrapped', true);
-                
+            if (wrapperWidth > maxWidth) {
                 var ellipsis = $('<span class="ellipsis"/>');
                 ellipsis.html('...');
                 ellipsis.appendTo(wrapper);
                 ellipsis.css('right', -1);
                 
-                wrapper.mouseenter(function() {
+                wrapper.hover(function() {
                     var timer = window.setTimeout(function() {
                         var pos = wrapper.offset();
                         parentContainer.css('overflow', 'visible');
@@ -52,48 +51,52 @@
                             overlay.html(wrapper.clone().html(text.replace('...', '').trim()));
                         }
                         
-                        if (options.container !== undefined) {
-                            overlay.appendTo(options.container);
-                        }
-                        else {
-                            overlay.appendTo(wrapper);
-                        }
-                        
+                        overlay.appendTo(container);
                         overlay.css(positionIt(pos));
-                        overlay.mouseleave(function() {
-                            hideIt(wrapper, parentContainer);
-                        });
                         
                         wrapper.children().first().css('visibility', 'hidden');
                     }, options.timeout);
                     
                     wrapper.data('timerId', timer);
+                }, function() {
+                    hideIt(wrapper, parentContainer);
                 });
             }
-            else if ((wrapperWidth <= maxWidth) && wrapper.data('ellipsisWrapped')) {
+            else if (wrapperWidth <= maxWidth) {
                 $('span.ellipsis', wrapper).remove();
                 wrapper.removeAttr('style');
-                wrapper.data('ellipsisWrapped', false);
             }
         });
         
         function hideIt(wrapper, parentContainer) {
+            var container = getContainer(wrapper);
+            var ellipsisOverlay = $('.ellipsisOverlay', container);
             var timerId = wrapper.data('timerId');
+            
+            if (ellipsisOverlay.length && !ellipsisOverlay.hasClass('is-hover')) {
+                ellipsisOverlay.hover(function() {
+                    $(this).addClass('is-hover');
+                }, function() {
+                    $(this).removeClass('is-hover');
+                    clearTimerAndHide(wrapper, parentContainer, container, timerId);
+                });
+            }
+            else {
+                clearTimerAndHide(wrapper, parentContainer, container, timerId);
+            }
+        };
+        
+        function clearTimerAndHide(wrapper, parentContainer, container, timerId) {
             if (timerId !== null) {
                 window.clearTimeout(timerId);
                 $.removeData(wrapper, 'timerId');
             }
             
-            if (options.container !== undefined) {
-                $('span.ellipsisOverlay', options.container).remove();
-            }
-            else {
-                $('span.ellipsisOverlay', wrapper).remove();
-            }
+            $('span.ellipsisOverlay', container).remove();
             
             wrapper.children().first().css('visibility', 'visible');
             parentContainer.css('overflow', 'visible');
-        };
+        }
         
         function positionIt(pos) {
             var css = {};
@@ -117,5 +120,22 @@
             
             return css;
         };
+        
+        function getContainer(wrapper) {
+            var container;
+            
+            if (options.container !== undefined) {
+                container = $(options.container);
+            }
+            else {
+                container = wrapper;
+            }
+            
+            return container;
+        }
     };
+    
+    $(document).ready(function() {
+        $('.ellipsisWrapper').ellipsis();
+    });
 })(jQuery);
