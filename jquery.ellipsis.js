@@ -13,7 +13,7 @@
         var wrappers = $(this);
         wrappers.each(function() {
             var wrapper = $(this);
-            if (!wrapper.data('ellipsisWrapped')) {
+            if (wrapper.is(':visible') && !wrapper.data('ellipsisWrapped')) {
                 var container = getContainer(wrapper);
                 
                 if (!wrapper.children().length) {
